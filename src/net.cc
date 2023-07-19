@@ -290,18 +290,6 @@ ncclResult_t ncclNetInit(struct ncclComm* comm) {
 
 ncclResult_t ncclGpuGdrSupport(struct ncclComm* comm, int* gdrSupport) {
   constexpr int GPU_BUF_SIZE = 2*1024*1024;
-#if CUDART_VERSION >= 11030
-  // In CUDA 11.3 and later we can now query the cudaDevAttrGPUDirectRDMASupported attribute
-  int driverVersion;
-  CUDACHECK(cudaDriverGetVersion(&driverVersion));
-  if (driverVersion >= 11030) {
-    int cudaDev, attr = 0;
-    CUDACHECK(cudaGetDevice(&cudaDev));
-    CUDACHECK(cudaDeviceGetAttribute(&attr, cudaDevAttrGPUDirectRDMASupported, cudaDev));
-    *gdrSupport = attr;
-    return ncclSuccess;
-  }
-#endif
   static int gdrSupportMatrix[32] = {
 	  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
