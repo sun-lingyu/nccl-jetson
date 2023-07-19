@@ -181,7 +181,8 @@ ncclResult_t ncclTransportP2pSetup(struct ncclComm* comm, struct ncclTopoGraph* 
       }
     }
   }
-
+  
+  WARN("After Loop on all channels");
   // Clear all connect masks and free each connectInfo array
   for (int i=1; i<comm->nRanks; i++) {
     int recvPeer = (comm->rank - i + comm->nRanks) % comm->nRanks;
