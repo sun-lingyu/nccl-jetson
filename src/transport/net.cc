@@ -444,7 +444,6 @@ static ncclResult_t sharedBuffersInit(struct ncclProxyState* proxyState, int cud
       NCCLCHECK(ncclP2pAllocateShareableBuffer(state->size, &state->ipcDesc, (void**)&state->cudaBuff));
     } else {
       NCCLCHECK(ncclCudaHostCalloc(&state->cudaBuff, state->size));
-      WARN("Modified ncclCudaCalloc to ncclCudaHostCalloc in sharedBuffersInit!");
     }
   }
   if (!cuda && state->hostBuff == NULL) {
@@ -475,7 +474,6 @@ static ncclResult_t sharedBuffersDestroy(struct ncclProxyState* proxyState, int 
         NCCLCHECK(ncclP2pFreeShareableBuffer(&state->ipcDesc));
       }
       NCCLCHECK(ncclCudaHostFree(state->cudaBuff));
-      WARN("modified ncclCudaFree to ncclCudaHostFree in sharedBuffersDestroy");
     }
     if (state->hostBuff) NCCLCHECK(ncclCudaHostFree(state->hostBuff));
   }
@@ -636,7 +634,6 @@ static ncclResult_t sendProxyConnect(struct ncclProxyConnection* connection, str
         NCCLCHECK(ncclP2pAllocateShareableBuffer(map->mems[NCCL_NET_MAP_DEVMEM].size, &map->mems[NCCL_NET_MAP_DEVMEM].ipcDesc,
                                                  (void**)&map->mems[NCCL_NET_MAP_DEVMEM].gpuPtr));
       } else {
-        WARN("modified ncclCudaCalloc to ncclCudaHostCalloc in sendProxyConnect");
         NCCLCHECK(ncclCudaHostCalloc(&map->mems[NCCL_NET_MAP_DEVMEM].gpuPtr, map->mems[NCCL_NET_MAP_DEVMEM].size));
       }
       map->mems[NCCL_NET_MAP_DEVMEM].cpuPtr = map->mems[NCCL_NET_MAP_DEVMEM].gpuPtr;
@@ -773,7 +770,6 @@ static ncclResult_t recvProxyConnect(struct ncclProxyConnection* connection, str
         NCCLCHECK(ncclP2pAllocateShareableBuffer(map->mems[NCCL_NET_MAP_DEVMEM].size, &map->mems[NCCL_NET_MAP_DEVMEM].ipcDesc,
                                                  (void**)&map->mems[NCCL_NET_MAP_DEVMEM].gpuPtr));
       } else {
-        WARN("modified ncclCudaCalloc to ncclCudaHostCalloc in recvProxyConnect");
         NCCLCHECK(ncclCudaHostCalloc(&map->mems[NCCL_NET_MAP_DEVMEM].gpuPtr, map->mems[NCCL_NET_MAP_DEVMEM].size));
       }
       map->mems[NCCL_NET_MAP_DEVMEM].cpuPtr = map->mems[NCCL_NET_MAP_DEVMEM].gpuPtr;
@@ -841,7 +837,6 @@ static ncclResult_t sendProxyFree(struct ncclProxyConnection* connection, struct
     } else {
       NCCLCHECK(ncclShmClose(mems[NCCL_NET_MAP_HOSTMEM].createHandle));
     }
-    WARN("modified ncclCudaFree to ncclCudaHostFree in sendProxyFree");
     NCCLCHECK(ncclCudaHostFree(mems[NCCL_NET_MAP_DEVMEM].cpuPtr));
     if (!resources->map.sameProcess || ncclCuMemEnable()) {
       // cuMem API support
@@ -883,7 +878,6 @@ static ncclResult_t recvProxyFree(struct ncclProxyConnection* connection, struct
     }
     struct connectMapMem* mems = resources->map.mems;
     NCCLCHECK(ncclCudaHostFree(mems[NCCL_NET_MAP_HOSTMEM].cpuPtr));
-    WARN("modified ncclCudaFree to ncclCudaHostFree in recvProxyFree");
     NCCLCHECK(ncclCudaHostFree(mems[NCCL_NET_MAP_DEVMEM].cpuPtr));
     if (!resources->map.sameProcess || ncclCuMemEnable()) {
       // cuMem API support
